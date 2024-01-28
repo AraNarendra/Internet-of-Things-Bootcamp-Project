@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "author": "Anonymous maker",
+    "editor": "wokwi",
+    "parts": [
+      {
+        "type": "board-esp32-devkit-c-v4",
+        "id": "esp",
+        "top": -49.14,
+        "left": 217.7,
+        "rotate": 270,
+        "attrs": {}
+      },
+      {
+        "type": "wokwi-dht22",
+        "id": "dht1",
+        "top": 218.7,
+        "left": 322.8,
+        "rotate": 180,
+        "attrs": {}
+      },
+      {
+        "type": "wokwi-photoresistor-sensor",
+        "id": "ldr1",
+        "top": 236.9,
+        "left": 119.5,
+        "rotate": 270,
+        "attrs": {}
+      },
+      {
+        "type": "wokwi-led",
+        "id": "led1",
+        "top": -176.4,
+        "left": 138.2,
+        "attrs": { "color": "limegreen" }
+      },
+      {
+        "type": "wokwi-resistor",
+        "id": "r1",
+        "top": -91.2,
+        "left": 133.85,
+        "rotate": 90,
+        "attrs": { "value": "1000" }
+      },
+      { "type": "wokwi-servo", "id": "servo1", "top": 74.8, "left": 451.2, "attrs": {} },
+      {
+        "type": "wokwi-lcd2004",
+        "id": "lcd1",
+        "top": -185.6,
+        "left": 264.8,
+        "attrs": { "pins": "i2c" }
+      }
+    ],
+    "connections": [
+      [ "esp:TX", "$serialMonitor:RX", "", [] ],
+      [ "esp:RX", "$serialMonitor:TX", "", [] ],
+      [ "dht1:GND", "esp:GND.1", "black", [ "v-9.6", "h-38.4" ] ],
+      [ "dht1:SDA", "esp:13", "green", [ "v-19.2", "h-57.7" ] ],
+      [ "ldr1:GND", "esp:GND.1", "black", [ "v-57.6", "h105.2" ] ],
+      [ "led1:A", "r1:1", "green", [ "v0" ] ],
+      [ "r1:2", "esp:23", "green", [ "h67.2", "v66" ] ],
+      [ "led1:C", "esp:GND.2", "green", [ "v96", "h38.8" ] ],
+      [ "lcd1:GND", "esp:GND.3", "black", [ "h-19.2", "v9.6" ] ],
+      [ "lcd1:VCC", "esp:3V3", "red", [ "h-48", "v134.5", "h-67.2", "v115.35" ] ],
+      [ "lcd1:SDA", "esp:21", "green", [ "h-28.8", "v9.8" ] ],
+      [ "lcd1:SCL", "esp:22", "green", [ "h-57.6", "v0.3" ] ],
+      [ "ldr1:VCC", "esp:3V3", "red", [ "v-57.6", "h-9.6" ] ],
+      [ "ldr1:AO", "esp:34", "green", [ "v-19.2", "h-10.3" ] ],
+      [ "dht1:VCC", "esp:5V", "red", [ "v0" ] ],
+      [ "servo1:V+", "esp:5V", "green", [ "h-76.8", "v-28.7" ] ],
+      [ "servo1:PWM", "esp:18", "green", [ "h-9.6", "v0.2", "h-57.6", "v-144", "h-115.2" ] ],
+      [ "servo1:GND", "esp:GND.1", "black", [ "h0" ] ]
+    ],
+    "dependencies": {}
+  }
