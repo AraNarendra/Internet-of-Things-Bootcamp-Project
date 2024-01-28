@@ -19,7 +19,7 @@ const int servoPin =  18;
 #define LDRPIN 34 
 
 const float gama = 0.7;
-const float rl10 = 50;
+const float rl10 = 30;
 int pos = 0;
 
 const char* tempTopic = "ESP32/temperature";
