@@ -223,13 +223,13 @@ void loop() {
             SMTP_Message message;
 
             /* Set the message headers */
-            message.sender.name = F("ESP");
+            message.sender.name = F("ESP32 Plant Monitoring System");
             message.sender.email = AUTHOR_EMAIL;
-            message.subject = F("Peringatan!!!");
+            message.subject = F("PERINGATAN!!!");
             message.addRecipient(F("Bro"), RECIPIENT_EMAIL);
 
             //Send raw text message
-            String textMsg = "Halo, tanamanmu membutuhkan cahaya segera!";
+            String textMsg = "Tanamanmu sedang kekurangan cahaya, segera pindahkan ke tempat yang lebih terang!";
             message.text.content = textMsg.c_str();
             message.text.charSet = "us-ascii";
             message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
