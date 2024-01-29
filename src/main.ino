@@ -5,6 +5,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <math.h>
+#include <ESP_Mail_Client.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Servo servo;
 
@@ -12,6 +13,25 @@ const char* wifiSsid = "Wokwi-GUEST";
 const char* wifiPassword = "";
 const char* mqttServer = "broker.emqx.io";
 const int mqttPort = 1883;
+
+//declare for SMTP gmail
+#define SMTP_HOST "smtp.gmail.com"
+#define SMTP_PORT 465
+
+//The sign in credentials
+#define AUTHOR_EMAIL "penyiramtanaman8@gmail.com"
+#define AUTHOR_PASSWORD "ebas zpsj didi sfhj"
+
+/* Recipient's email*/
+#define RECIPIENT_EMAIL "aradwi051203@gmail.com"
+
+/* Declare the global used SMTPSession object for SMTP transport */
+SMTPSession smtp;
+
+/* Callback function to get the Email sending status */
+void smtpCallback(SMTP_Status status);
+
+bool isSent = false;
 
 const int ledPin =  23;
 const int dhtPin =  13;
@@ -124,6 +144,13 @@ void setup() {
     wifiConnect();
     client.setServer(mqttServer, mqttPort);
     client.setCallback(mqttCallback);
+
+    //Set the network reconnection option
+    MailClient.networkReconnect(true);
+    smtp.debug(1);
+
+    //Set the callback function to get the sending results
+    smtp.callback(smtpCallback);    
 }
 
 void loop() {
@@ -146,7 +173,6 @@ void loop() {
             servo.write(0);                          
         }
 
-		
         Serial.print("Humidity: ");
         Serial.print(humidity);
         Serial.println("%");
@@ -178,6 +204,64 @@ void loop() {
             light = "Direct Sunlight";
         }
 
+        if (isSent == false && lux < 490){
+            /* Declare the Session_Config for user defined session credentials */
+            Session_Config config;
+
+            /* Set the session config */
+            config.server.host_name = SMTP_HOST;
+            config.server.port = SMTP_PORT;
+            config.login.email = AUTHOR_EMAIL;
+            config.login.password = AUTHOR_PASSWORD;
+            config.login.user_domain = "";
+
+            config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+            config.time.gmt_offset = 3;
+            config.time.day_light_offset = 0;
+
+            /* Declare the message class */
+            SMTP_Message message;
+
+            /* Set the message headers */
+            message.sender.name = F("ESP");
+            message.sender.email = AUTHOR_EMAIL;
+            message.subject = F("Peringatan!!!");
+            message.addRecipient(F("Bro"), RECIPIENT_EMAIL);
+
+            //Send raw text message
+            String textMsg = "Halo, tanamanmu membutuhkan cahaya segera!";
+            message.text.content = textMsg.c_str();
+            message.text.charSet = "us-ascii";
+            message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+
+            message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
+            message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+
+
+            /* Connect to the server */
+            if (!smtp.connect(&config)){
+                ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+                return;
+            }
+
+            if (!smtp.isLoggedIn()){
+                Serial.println("\nNot yet logged in.");
+            }
+            else{
+                if (smtp.isAuthenticated())
+                    Serial.println("\nSuccessfully logged in.");
+                else
+                    Serial.println("\nConnected with no Auth.");
+            }
+
+            /* Start sending Email and close the session */
+            if (!MailClient.sendMail(&smtp, &message))
+            ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+            isSent = true;
+        } else if (lux > 490){
+            isSent = false;
+        }
+
         //publish humidity and temperature to mqtt server
         char statusMessage[16];
         snprintf(statusMessage, 5, "%f", humidity);
@@ -188,5 +272,33 @@ void loop() {
         client.publish(weatherTopic, statusMessage);
         snprintf(statusMessage, 9, "%f", lux);
         client.publish(luxTopic, statusMessage);
+    }
+}
+
+void smtpCallback(SMTP_Status status){
+    /* Print the current status */
+    Serial.println(status.info());
+
+    /* Print the sending result */
+    if (status.success()){
+        Serial.println("----------------");
+        ESP_MAIL_PRINTF("Message sent success: %d\n", status.completedCount());
+        ESP_MAIL_PRINTF("Message sent failed: %d\n", status.failedCount());
+        Serial.println("----------------\n");
+
+        for (size_t i = 0; i < smtp.sendingResult.size(); i++){
+            /* Get the result item */
+            SMTP_Result result = smtp.sendingResult.getItem(i);
+
+            ESP_MAIL_PRINTF("Message No: %d\n", i + 1);
+            ESP_MAIL_PRINTF("Status: %s\n", result.completed ? "success" : "failed");
+            ESP_MAIL_PRINTF("Date/Time: %s\n", MailClient.Time.getDateTimeString(result.timestamp, "%B %d, %Y %H:%M:%S").c_str());
+            ESP_MAIL_PRINTF("Recipient: %s\n", result.recipients.c_str());
+            ESP_MAIL_PRINTF("Subject: %s\n", result.subject.c_str());
+        }
+        Serial.println("----------------\n");
+
+        // You need to clear sending result as the memory usage will grow up.
+        smtp.sendingResult.clear();
     }
 }
