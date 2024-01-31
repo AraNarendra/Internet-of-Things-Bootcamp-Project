@@ -25,8 +25,9 @@ const int mqttPort = 1883;
 //Recipient's email
 #define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL HERE"
 
-//Declare the global used SMTPSession object for SMTP transport
-SMTPSession smtp;
+SMTPSession smtp; //Declare the global used SMTPSession object for SMTP transport
+SMTP_Message message; //Declare the message class
+Session_Config config; //Declare the Session_Config for user defined session credentials
 
 const int ledPin =  23;
 const int dhtPin =  13;
@@ -56,6 +57,39 @@ bool isSent = false;
 bool servoTurnOn = false;
 
 void smtpCallback(SMTP_Status status);
+
+void smtpConnect(){
+    //Set the session config
+    config.server.host_name = SMTP_HOST;
+    config.server.port = SMTP_PORT;
+    config.login.email = AUTHOR_EMAIL;
+    config.login.password = AUTHOR_PASSWORD;
+    config.login.user_domain = "";
+
+    config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+    config.time.gmt_offset = 3;
+    config.time.day_light_offset = 0;
+
+    //Set the message headers
+    message.sender.name = F("ESP32 Plant Monitoring System");
+    message.sender.email = AUTHOR_EMAIL;
+    message.subject = F("Peringatan Kondisi Tanaman");
+    message.addRecipient(F("Mr./Mrs."), RECIPIENT_EMAIL);
+
+    //Send raw text message
+    String textMsg = "Tanamanmu sedang kekurangan cahaya, segera pindahkan ke tempat yang lebih terang!";
+    message.text.content = textMsg.c_str();
+    message.text.charSet = "us-ascii";
+    message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
+    message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
+    message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+
+    ///Connect to the server
+    if (!smtp.connect(&config)){
+        ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
+        return;
+    }
+}
 
 void showStatus(bool status) {
     String statusString;
@@ -148,7 +182,10 @@ void setup() {
     smtp.debug(1);
 
     //Set the callback function to get the sending results
-    smtp.callback(smtpCallback);    
+    smtp.callback(smtpCallback); 
+
+    //call smtp connection function
+    smtpConnect(); 
 }
 
 void loop() {
@@ -204,43 +241,11 @@ void loop() {
         }
 
         if (isSent == false && lux < 490){
-            //Declare the Session_Config for user defined session credentials */
-            Session_Config config;
-
-            //Set the session config */
-            config.server.host_name = SMTP_HOST;
-            config.server.port = SMTP_PORT;
-            config.login.email = AUTHOR_EMAIL;
-            config.login.password = AUTHOR_PASSWORD;
-            config.login.user_domain = "";
-
-            config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
-            config.time.gmt_offset = 3;
-            config.time.day_light_offset = 0;
-
-            //Declare the message class
-            SMTP_Message message;
-
-            //Set the message headers
-            message.sender.name = F("ESP32 Plant Monitoring System");
-            message.sender.email = AUTHOR_EMAIL;
-            message.subject = F("PEMBERITAHUAN KONDISI TANAMAN");
-            message.addRecipient(F("Mr./Mrs."), RECIPIENT_EMAIL);
-
-            //Send raw text message
-            String textMsg = "Tanamanmu sedang kekurangan cahaya, segera pindahkan ke tempat yang lebih terang!";
-            message.text.content = textMsg.c_str();
-            message.text.charSet = "us-ascii";
-            message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
-            message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
-            message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
-
             //Connect to the server
             if (!smtp.connect(&config)){
                 ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
                 return;
             }
-
             if (!smtp.isLoggedIn()){
                 Serial.println("\nNot yet logged in.");
             }
