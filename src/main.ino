@@ -168,14 +168,10 @@ void loop() {
         float temperature = dhtSensor.readTemperature();
 
         if (servoTurnOn == false && humidity < 60){
-            for (pos = 0; pos <= 90; pos += 1) {
-                servo.write(pos);
-            }
+            servo.write(90);
             servoTurnOn = true;
         } else if (humidity >= 60){ 
-            for (pos = 90; pos >= 0; pos -= 1) {
-                servo.write(pos);
-            }
+            servo.write(0);
             servoTurnOn = false;                          
         }
 
