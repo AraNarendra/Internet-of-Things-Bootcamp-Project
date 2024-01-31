@@ -35,7 +35,6 @@ const int servoPin =  18;
 
 const float gama = 0.7;
 const float rl10 = 50;
-int pos;
 
 const char* tempTopic = "ESP32/temperature";
 const char* humTopic = "ESP32/humidity";
@@ -56,33 +55,7 @@ bool activeStatus = false;
 bool isSent = false;
 bool servoTurnOn = false;
 
-void smtpCallback(SMTP_Status status){
-    //Print the current status
-    Serial.println(status.info());
-
-    //Print the sending result
-    if (status.success()){
-        Serial.println("----------------");
-        ESP_MAIL_PRINTF("Message sent success: %d\n", status.completedCount());
-        ESP_MAIL_PRINTF("Message sent failed: %d\n", status.failedCount());
-        Serial.println("----------------\n");
-
-        for (size_t i = 0; i < smtp.sendingResult.size(); i++){
-            //Get the result item
-            SMTP_Result result = smtp.sendingResult.getItem(i);
-
-            ESP_MAIL_PRINTF("Message No: %d\n", i + 1);
-            ESP_MAIL_PRINTF("Status: %s\n", result.completed ? "success" : "failed");
-            ESP_MAIL_PRINTF("Date/Time: %s\n", MailClient.Time.getDateTimeString(result.timestamp, "%B %d, %Y %H:%M:%S").c_str());
-            ESP_MAIL_PRINTF("Recipient: %s\n", result.recipients.c_str());
-            ESP_MAIL_PRINTF("Subject: %s\n", result.subject.c_str());
-        }
-        Serial.println("----------------\n");
-
-        //clear sending result as the memory usage will grow up.
-        smtp.sendingResult.clear();
-    }
-}
+void smtpCallback(SMTP_Status status);
 
 void showStatus(bool status) {
     String statusString;
@@ -251,18 +224,16 @@ void loop() {
             //Set the message headers
             message.sender.name = F("ESP32 Plant Monitoring System");
             message.sender.email = AUTHOR_EMAIL;
-            message.subject = F("PERINGATAN!!!");
-            message.addRecipient(F("Bro"), RECIPIENT_EMAIL);
+            message.subject = F("PEMBERITAHUAN KONDISI TANAMAN");
+            message.addRecipient(F("Mr./Mrs."), RECIPIENT_EMAIL);
 
             //Send raw text message
             String textMsg = "Tanamanmu sedang kekurangan cahaya, segera pindahkan ke tempat yang lebih terang!";
             message.text.content = textMsg.c_str();
             message.text.charSet = "us-ascii";
             message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
-
             message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
             message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
-
 
             //Connect to the server
             if (!smtp.connect(&config)){
@@ -298,5 +269,33 @@ void loop() {
         client.publish(weatherTopic, statusMessage);
         snprintf(statusMessage, 9, "%f", lux);
         client.publish(luxTopic, statusMessage);
+    }
+}
+
+void smtpCallback(SMTP_Status status){
+    //Print the current status
+    Serial.println(status.info());
+
+    //Print the sending result
+    if (status.success()){
+        Serial.println("----------------");
+        ESP_MAIL_PRINTF("Message sent success: %d\n", status.completedCount());
+        ESP_MAIL_PRINTF("Message sent failed: %d\n", status.failedCount());
+        Serial.println("----------------\n");
+
+        for (size_t i = 0; i < smtp.sendingResult.size(); i++){
+            //Get the result item
+            SMTP_Result result = smtp.sendingResult.getItem(i);
+
+            ESP_MAIL_PRINTF("Message No: %d\n", i + 1);
+            ESP_MAIL_PRINTF("Status: %s\n", result.completed ? "success" : "failed");
+            ESP_MAIL_PRINTF("Date/Time: %s\n", MailClient.Time.getDateTimeString(result.timestamp, "%B %d, %Y %H:%M:%S").c_str());
+            ESP_MAIL_PRINTF("Recipient: %s\n", result.recipients.c_str());
+            ESP_MAIL_PRINTF("Subject: %s\n", result.subject.c_str());
+        }
+        Serial.println("----------------\n");
+
+        //clear sending result as the memory usage will grow up.
+        smtp.sendingResult.clear();
     }
 }
