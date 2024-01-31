@@ -19,11 +19,11 @@ const int mqttPort = 1883;
 #define SMTP_PORT 465
 
 //The sign in credentials
-#define AUTHOR_EMAIL "ENTER THE EMAIL ADDRESS USED TO SEND THE EMAIL HERE"
-#define AUTHOR_PASSWORD "ENTER THE APP PASSWORD HERE"
+#define AUTHOR_EMAIL "penyiramtanaman8@gmail.com"
+#define AUTHOR_PASSWORD "ebas zpsj didi sfhj"
 
 /* Recipient's email*/
-#define RECIPIENT_EMAIL "ENTER THE EMAIL ADDRESS TO RECEIVE THE EMAIL HERE"
+#define RECIPIENT_EMAIL "aradwi051203@gmail.com"
 
 /* Declare the global used SMTPSession object for SMTP transport */
 SMTPSession smtp;
@@ -41,7 +41,7 @@ const int servoPin =  18;
 
 const float gama = 0.7;
 const float rl10 = 50;
-int pos = 0;
+int pos;
 
 const char* tempTopic = "ESP32/temperature";
 const char* humTopic = "ESP32/humidity";
@@ -171,6 +171,7 @@ void loop() {
             for (pos = 0; pos <= 90; pos += 1) {
                 servo.write(pos);
             }
+            servoTurnOn = true;
         } else if (humidity >= 60){ 
             for (pos = 90; pos >= 0; pos -= 1) {
                 servo.write(pos);
