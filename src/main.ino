@@ -19,11 +19,11 @@ const int mqttPort = 1883;
 #define SMTP_PORT 465
 
 //The sign in credentials
-#define AUTHOR_EMAIL "penyiramtanaman8@gmail.com"
-#define AUTHOR_PASSWORD "ebas zpsj didi sfhj"
+#define AUTHOR_EMAIL "ENTER EMAIL ADDRESS WHO WILL SEND THE EMAIL HERE"
+#define AUTHOR_PASSWORD "ENTER APP PASSWORD HERE"
 
 //Recipient's email
-#define RECIPIENT_EMAIL "aradwi051203@gmail.com"
+#define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL HERE"
 
 //Declare the global used SMTPSession object for SMTP transport
 SMTPSession smtp;
