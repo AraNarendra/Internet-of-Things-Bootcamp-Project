@@ -19,11 +19,11 @@ const int mqttPort = 1883;
 #define SMTP_PORT 465
 
 //The sign in credentials
-#define AUTHOR_EMAIL "ENTER EMAIL ADDRESS WHO WILL SEND THE EMAIL HERE"
+#define AUTHOR_EMAIL "ENTER SENDER EMAIL ADRRESS HERE"
 #define AUTHOR_PASSWORD "ENTER APP PASSWORD HERE"
 
 //Recipient's email
-#define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL HERE"
+#define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL ADDRESS HERE"
 
 SMTPSession smtp; //Declare the global used SMTPSession object for SMTP transport
 SMTP_Message message; //Declare the message class
@@ -65,7 +65,7 @@ void smtpConnect(){
     config.login.email = AUTHOR_EMAIL;
     config.login.password = AUTHOR_PASSWORD;
     config.login.user_domain = "";
-
+    
     config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
     config.time.gmt_offset = 3;
     config.time.day_light_offset = 0;
@@ -201,14 +201,6 @@ void loop() {
         float humidity = dhtSensor.readHumidity();
         float temperature = dhtSensor.readTemperature();
 
-        if (servoTurnOn == false && humidity < 60){
-            servo.write(90);
-            servoTurnOn = true;
-        } else if (humidity >= 60){ 
-            servo.write(0);
-            servoTurnOn = false;                          
-        }
-
         Serial.print("Humidity: ");
         Serial.print(humidity);
         Serial.println("%");
@@ -240,6 +232,27 @@ void loop() {
             light = "Direct Sunlight";
         }
 
+        //publish humidity and temperature to mqtt server
+        char statusMessage[16];
+        snprintf(statusMessage, 5, "%f", humidity);
+        client.publish(humTopic, statusMessage);
+        snprintf(statusMessage, 5, "%f", temperature);
+        client.publish(tempTopic, statusMessage);
+        sniprintf(statusMessage, 16, "%s", light.c_str());
+        client.publish(weatherTopic, statusMessage);
+        snprintf(statusMessage, 9, "%f", lux);
+        client.publish(luxTopic, statusMessage);
+
+        //control servo motor
+        if (servoTurnOn == false && humidity < 60){
+            servo.write(90);
+            servoTurnOn = true;
+        } else if (humidity >= 60){ 
+            servo.write(0);
+            servoTurnOn = false;                          
+        }
+        
+        //send email if humidity is less than 60%
         if (isSent == false && lux < 490){
             //Connect to the server
             if (!smtp.connect(&config)){
@@ -263,17 +276,6 @@ void loop() {
         } else if (lux > 490){
             isSent = false;
         }
-
-        //publish humidity and temperature to mqtt server
-        char statusMessage[16];
-        snprintf(statusMessage, 5, "%f", humidity);
-        client.publish(humTopic, statusMessage);
-        snprintf(statusMessage, 5, "%f", temperature);
-        client.publish(tempTopic, statusMessage);
-        sniprintf(statusMessage, 16, "%s", light.c_str());
-        client.publish(weatherTopic, statusMessage);
-        snprintf(statusMessage, 9, "%f", lux);
-        client.publish(luxTopic, statusMessage);
     }
 }
 
