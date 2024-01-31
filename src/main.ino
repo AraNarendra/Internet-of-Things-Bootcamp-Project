@@ -32,6 +32,7 @@ SMTPSession smtp;
 void smtpCallback(SMTP_Status status);
 
 bool isSent = false;
+bool servoTurnOn = false;
 
 const int ledPin =  23;
 const int dhtPin =  13;
@@ -166,11 +167,15 @@ void loop() {
         float humidity = dhtSensor.readHumidity();
         float temperature = dhtSensor.readTemperature();
 
-        if (humidity < 60){
-            servo.write(90);
-        
+        if (servoTurnOn == false && humidity < 60){
+            for (pos = 0; pos <= 90; pos += 1) {
+                servo.write(pos);
+            }
         } else if (humidity >= 60){ 
-            servo.write(0);                          
+            for (pos = 90; pos >= 0; pos -= 1) {
+                servo.write(pos);
+            }
+            servoTurnOn = false;                          
         }
 
         Serial.print("Humidity: ");
