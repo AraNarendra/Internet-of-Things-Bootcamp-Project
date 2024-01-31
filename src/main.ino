@@ -19,8 +19,8 @@ const int mqttPort = 1883;
 #define SMTP_PORT 465
 
 //The sign in credentials
-#define AUTHOR_EMAIL "ENTER SENDER EMAIL ADRRESS HERE"
-#define AUTHOR_PASSWORD "ENTER APP PASSWORD HERE"
+#define AUTHOR_EMAIL "ENTER SENDER EMAIL ADDRESS HERE"
+#define AUTHOR_PASSWORD "ENTER SENDER EMAIL APP PASSWORD HERE"
 
 //Recipient's email
 #define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL ADDRESS HERE"
@@ -251,7 +251,7 @@ void loop() {
             servo.write(0);
             servoTurnOn = false;                          
         }
-        
+
         //send email if humidity is less than 60%
         if (isSent == false && lux < 490){
             //Connect to the server
