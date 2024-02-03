@@ -26,7 +26,7 @@ const int mqttPort = 1883;
 //Recipient's email
 #define RECIPIENT_EMAIL "ENTER RECIPIENT EMAIL ADDRESS HERE"
 
-SMTPSession smtp; //Declare the global used SMTPSession object for SMTP transport
+SMTPSession smtp; //Declare the global SMTPSession object for SMTP transport
 SMTP_Message message; //Declare the message class
 Session_Config config; //Declare the Session_Config for user defined session credentials
 
