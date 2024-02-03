@@ -6,6 +6,7 @@
 #include <PubSubClient.h>
 #include <math.h>
 #include <ESP_Mail_Client.h>
+#include <email.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Servo servo;
 
@@ -76,13 +77,12 @@ void smtpConnect(){
     message.subject = F("Peringatan Kondisi Tanaman");
     message.addRecipient(F("Mr./Mrs."), RECIPIENT_EMAIL);
 
-    //Send raw text message
-    String textMsg = "Tanamanmu sedang kekurangan cahaya, segera pindahkan ke tempat yang lebih terang!";
-    message.text.content = textMsg.c_str();
+    //Send HTML message
+    String htmlMsg = email; 
+    message.html.content = htmlMsg.c_str();
+    message.html.content = htmlMsg.c_str();
     message.text.charSet = "us-ascii";
-    message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
-    message.priority = esp_mail_smtp_priority::esp_mail_smtp_priority_low;
-    message.response.notify = esp_mail_smtp_notify_success | esp_mail_smtp_notify_failure | esp_mail_smtp_notify_delay;
+    message.html.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
 
     ///Connect to the server
     if (!smtp.connect(&config)){
@@ -222,7 +222,7 @@ void loop() {
         String light;
         if (lux < 50) {
             light = "Night Light";
-        } else if (lux < 989) {
+        } else if (lux < 1000) {
             light = "Room Light";
         } else if (lux <= 9673){
             light = "Overcast Day";
@@ -243,17 +243,17 @@ void loop() {
         snprintf(statusMessage, 9, "%f", lux);
         client.publish(luxTopic, statusMessage);
 
-        //control servo motor
-        if (servoTurnOn == false && humidity < 60){
+        //control servo motor turn on/off
+        if (servoTurnOn == false && humidity < 40){
             servo.write(90);
             servoTurnOn = true;
-        } else if (humidity >= 60){ 
+        } else if (humidity >= 40){ 
             servo.write(0);
             servoTurnOn = false;                          
         }
 
-        //send email if humidity is less than 60%
-        if (isSent == false && lux < 490){
+        //send email if lux is less than 1000
+        if (isSent == false && lux < 1000){
             //Connect to the server
             if (!smtp.connect(&config)){
                 ESP_MAIL_PRINTF("Connection error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
@@ -273,7 +273,7 @@ void loop() {
             if (!MailClient.sendMail(&smtp, &message))
             ESP_MAIL_PRINTF("Error, Status Code: %d, Error Code: %d, Reason: %s", smtp.statusCode(), smtp.errorCode(), smtp.errorReason().c_str());
             isSent = true;
-        } else if (lux > 490){
+        } else if (lux >= 1000){
             isSent = false;
         }
     }
