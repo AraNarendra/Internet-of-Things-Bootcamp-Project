@@ -171,6 +171,7 @@ void setup() {
     dhtSensor.begin();
     lcd.init();
     servo.attach(servoPin);
+    servo.write(0);
 
     //call wifi connection function
     wifiConnect();
