@@ -71,30 +71,21 @@ const char* email = R"(<!DOCTYPE html>
 				max-height: none !important;
 			}
 
-			.row-1 .column-1 .block-1.image_block td.pad {
-				padding: 10px !important;
-			}
-
-			.row-1 .column-1 .block-2.heading_block h1,
-			.row-3 .column-1 .block-2.paragraph_block td.pad>div {
-				text-align: center !important;
-				font-size: 15px !important;
-			}
-
-			.row-1 .column-1 .block-2.heading_block td.pad {
-				padding: 5px 0 0 !important;
-			}
-
-			.row-3 .column-1 .block-1.heading_block td.pad {
-				padding: 5px 20px 0 !important;
-			}
-
 			.row-3 .column-1 .block-1.heading_block h1 {
 				font-size: 28px !important;
 			}
 
+			.row-1 .column-1 .block-2.heading_block h1 {
+				text-align: center !important;
+			}
+
+			.row-1 .column-1 .block-2.heading_block h1,
+			.row-3 .column-1 .block-2.paragraph_block td.pad>div {
+				font-size: 15px !important;
+			}
+
 			.row-3 .column-1 .block-2.paragraph_block td.pad {
-				padding: 15px 20px 10px !important;
+				padding: 15px 20px !important;
 			}
 
 			.row-2 .column-1 {
@@ -123,16 +114,16 @@ const char* email = R"(<!DOCTYPE html>
 												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 10px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
 													<table class="image_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 														<tr>
-															<td class="pad" style="padding-bottom:15px;padding-left:10px;padding-right:10px;padding-top:15px;width:100%;">
+															<td class="pad" style="padding-bottom:15px;padding-left:20px;padding-right:20px;padding-top:15px;width:100%;">
 																<div class="alignment" align="center" style="line-height:10px">
-																	<div style="max-width: 120px;"><img src="https://d1oco4z2z1fhwp.cloudfront.net/templates/default/8316/Logo_1.png" style="display: block; height: auto; border: 0; width: 100%;" width="120"></div>
+																	<div style="max-width: 120px;"><a href="https://www.example.com" target="_blank" style="outline:none" tabindex="-1"><img src="https://d1oco4z2z1fhwp.cloudfront.net/templates/default/8316/Logo_1.png" style="display: block; height: auto; border: 0; width: 100%;" width="120"></a></div>
 																</div>
 															</td>
 														</tr>
 													</table>
-													<table class="heading_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+													<table class="heading_block block-2" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 														<tr>
-															<td class="pad" style="padding-left:10px;padding-right:10px;padding-top:10px;text-align:center;width:100%;">
+															<td class="pad">
 																<h1 style="margin: 0; color: #32461e; direction: ltr; font-family: Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif; font-size: 30px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 36px;"><span class="tinyMce-placeholder">ESP32 PLANT MONITORING SYSTEM</span></h1>
 															</td>
 														</tr>
@@ -155,9 +146,9 @@ const char* email = R"(<!DOCTYPE html>
 												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-top: 15px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
 													<table class="image_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 														<tr>
-															<td class="pad" style="width:100%;">
+															<td class="pad" style="padding-left:15px;padding-right:15px;width:100%;">
 																<div class="alignment" align="center" style="line-height:10px">
-																	<div style="max-width: 600px;"><img src="https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/1139491_1125116/output-onlinegiftools.gif" style="display: block; height: auto; border: 0; width: 100%;" width="600"></div>
+																	<div style="max-width: 570px;"><a href="https://www.example.com" target="_blank" style="outline:none" tabindex="-1"><img src="https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/1139491_1125116/output-onlinegiftools.gif" style="display: block; height: auto; border: 0; width: 100%;" width="570"></a></div>
 																</div>
 															</td>
 														</tr>
